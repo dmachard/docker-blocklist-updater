@@ -24,4 +24,3 @@ jobs:
         docker login -u ${{ secrets.DOCKERHUB_LOGIN }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
         docker push dmachard/blocklist-updater:latest
         docker push dmachard/blocklist-updater:${{ github.event.release.tag_name }}
-s
