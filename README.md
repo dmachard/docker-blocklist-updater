@@ -5,7 +5,7 @@ Docker image to generate and update blocklist
 ## Docker run
 
 ```bash
-sudo docker run -d --env-file ./env.list --name=mon dmachard/blocklist-updater:latest
+sudo docker run -d -v ./data:/config --env-file ./env.list --name=blocklist dmachard/blocklist-updater:latest
 ```
 
 ## Docker build
