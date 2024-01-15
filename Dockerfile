@@ -9,6 +9,7 @@ WORKDIR /home/updater
 COPY . /home/updater/
 
 RUN apk update \
+    && apk add --no-cache gcc alpine-sdk python3-dev \
     && adduser -D updater \
     && pip install --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
