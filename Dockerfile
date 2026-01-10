@@ -1,4 +1,4 @@
-FROM python:3.23.2
+FROM python:3.14-alpine
 
 LABEL name="Python Blocklist Updater" \
       description="Python Blocklist Updater" \
