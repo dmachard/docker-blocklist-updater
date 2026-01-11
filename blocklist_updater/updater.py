@@ -9,8 +9,6 @@ import blocklist_aggregator
 from dotenv import load_dotenv
 
 logger = logging.getLogger("updater")
-loop = asyncio.get_event_loop()
-shutdown_task = None
 
 def setup_logger(debug):
     loglevel = logging.DEBUG if debug else logging.INFO
@@ -46,7 +44,7 @@ async def updater(every, start_shutdown, blocklist_config, blocklist_format, blo
         except asyncio.TimeoutError:
             pass
 
-async def shutdown(signal, loop, start_shutdown):
+async def shutdown_handler(signal, loop, start_shutdown):
     """perform graceful shutdown"""
     logger.debug("starting shutting down process")
     start_shutdown.set()
@@ -59,9 +57,27 @@ async def shutdown(signal, loop, start_shutdown):
 
     logger.debug("waiting for all tasks to exit")
     await asyncio.gather(*tasks, return_exceptions=True)
-
     logger.debug("all tasks have exited, stopping event loop")
-    loop.stop()
+
+async def main_async(delay_every, blocklist_config, blocklist_format, blocklist_output):
+    """Main async function"""
+    start_shutdown = asyncio.Event()
+    loop = asyncio.get_running_loop()
+    
+    # Setup signal handlers
+    for sig in (signal.SIGHUP, signal.SIGTERM, signal.SIGINT):
+        loop.add_signal_handler(sig, lambda: asyncio.create_task(
+            shutdown_handler(start_shutdown)
+        ))
+    
+    # Run updater
+    await updater(
+        every=delay_every,
+        start_shutdown=start_shutdown,
+        blocklist_config=blocklist_config,
+        blocklist_format=blocklist_format,
+        blocklist_output=blocklist_output,
+    )
 
 def start_updater():
     # default values
@@ -106,28 +122,12 @@ def start_updater():
         logger.error("missing env variable BLOCKLIST_UPDATER_OUTPUT_PATH")
         sys.exit(1)
 
-    # prepare shutdown handling
-    start_shutdown = asyncio.Event()
-    for sig in (signal.SIGHUP, signal.SIGTERM, signal.SIGINT):
-        loop.add_signal_handler(sig, lambda: asyncio.create_task(
-            shutdown(sig, loop, start_shutdown)
-        ))
-
-    # run monitor
-    loop.create_task(
-                    updater(
-                            every=delay_every,
-                            start_shutdown=start_shutdown,
-                            blocklist_config=blocklist_config,
-                            blocklist_format=blocklist_format,
-                            blocklist_output=blocklist_output,
-                        )
-                    )
-    
-    # run event loop 
+    # Run the async main function
     try:
-       loop.run_forever()
-    finally:
-       loop.close()
+        asyncio.run(main_async(
+            delay_every, blocklist_config, blocklist_format, blocklist_output
+        ))
+    except KeyboardInterrupt:
+        logger.info("Received keyboard interrupt")
     
     logger.debug("app terminated")
