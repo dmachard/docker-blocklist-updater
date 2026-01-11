@@ -3,12 +3,12 @@ updates:
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
-      interval: "moonthly"
+      interval: "monthly"
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
-      interval: "moonthly"
+      interval: "monthly"
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: "moonthly"
+      interval: "monthly"
