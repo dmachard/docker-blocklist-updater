@@ -20,8 +20,8 @@ sudo docker build . --file Dockerfile -t blocklist-updater
 
 | Variables | Description |
 | ------------- | ------------- |
-| PUBLICADDR_OVHCLOUD_DEBUG | debug mode 1 or 0 |
-| PUBLICADDR_OVHCLOUD_EVERY | delay between check, default is 3600s |
+| BLOCKLIST_UPDATER_DEBUG | debug mode 1 or 0 |
+| BLOCKLIST_UPDATER_EVERY | delay between check, default is 3600s |
 | BLOCKLIST_UPDATER_CONFIG_PATH | config file |
 | BLOCKLIST_UPDATER_OUTPUT_FORMAT | cdb|raw|hosts |
 | BLOCKLIST_UPDATER_OUTPUT_PATH | output file path |
