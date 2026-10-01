@@ -1,2 +1,2 @@
 python-dotenv==1.2.3
-blocklist_aggregator==1.6.1
+blocklist_aggregator==1.7.0
